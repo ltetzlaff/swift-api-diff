@@ -93,7 +93,7 @@ for old_tag in "$@"; do
         f=$(basename "$f")
         report="$tmpdir/$f.report"
         if [[ ! -f "$tmpdir/api-old/$f" ]]; then
-            echo "NOTICE: NEW MODULE $f"
+            echo "🆕 Module: $f"
             continue
         fi
 
@@ -103,21 +103,16 @@ for old_tag in "$@"; do
             > "$report" 2>&1
 
         if ! shasum "$report" | grep -q cefc4ee5bb7bcdb7cb5a7747efa178dab3c794d5; then
-            echo ERROR
-            echo >&2 "=============================="
-            echo >&2 "ERROR: public API change in $f"
-            echo >&2 "=============================="
+            echo >&2 "🔀 Public API change in $f"
             cat >&2 "$report"
             errors=$(( errors + 1 ))
-        else
-            echo OK
         fi
     done
     rm -rf "$tmpdir/api-new" "$tmpdir/api-old"
 done
 
 if [[ "$errors" == 0 ]]; then
-    echo "OK, all seems good"
+    echo "✅ No public API change"
 fi
 echo done
 exit "$errors"
