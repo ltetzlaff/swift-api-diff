@@ -1,0 +1,16 @@
+name: "Swift API Diff"
+description: "Comment changes in public interfaces on GitHub Pull Requests"
+author: "ltetzlaff"
+branding:
+  icon: "crosshair"
+  color: "orange"
+inputs:
+  against:
+    description: "Which branch to run the diff against"
+    required: true
+    default: "master"
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.against }}

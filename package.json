@@ -1,0 +1,16 @@
+{
+  "name": "swift-api-diff",
+  "version": "0.1.0",
+  "description": "Comment changes in public interfaces on GitHub Pull Requests",
+  "main": "src/entrypoint.js",
+  "files": ["src"],
+  "author": "ltetzlaff",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "actions-toolkit": "^2.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ltetzlaff/swift-api-diff.git"
+  }
+}
