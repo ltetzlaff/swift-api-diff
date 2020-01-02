@@ -9,7 +9,8 @@ RUN apt-get update && apt-get install -y jq
 COPY . .
 
 # Run the breakage checker script and store the result
-RUN $DIFFERENCES=(check_no_api_breakages.sh . $GITHUB_SHA $1 >> $REPORTFILE)
+RUN env
+RUN DIFFERENCES=$(./check_no_api_breakages.sh . $GITHUB_SHA $1 >> $REPORTFILE)
 
 RUN if [[ "$DIFFERENCES" == 0 ]]; then \
     echo "" >> ${REPORTFILE} \
