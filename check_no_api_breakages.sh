@@ -76,7 +76,7 @@ new_tag=$2
 shift 2
 
 repodir="$tmpdir/repo"
-git clone "$repo_url" "$repodir"
+git clone -q "$repo_url" "$repodir"
 git -C "$repodir" fetch -q origin '+refs/pull/*:refs/remotes/origin/pr/*'
 errors=0
 
@@ -93,7 +93,7 @@ for old_tag in "$@"; do
         f=$(basename "$f")
         report="$tmpdir/$f.report"
         if [[ ! -f "$tmpdir/api-old/$f" ]]; then
-            echo "🆕 Module: $f"
+            echo >&2 "🆕 Module: $f"
             continue
         fi
 
@@ -112,7 +112,7 @@ for old_tag in "$@"; do
 done
 
 if [[ "$errors" == 0 ]]; then
-    echo "✅ No public API change"
+    echo >&2 "✅ No public API change"
 fi
 echo done
 exit "$errors"

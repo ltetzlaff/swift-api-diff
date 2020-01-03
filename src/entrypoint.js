@@ -42,7 +42,7 @@ async function run() {
 
     tools.exit.success("Succesfully run!")
   } catch (error) {
-    tools.log.error(`Something went wrong ${error}!`)
+    tools.exit.failure(`Something went wrong ${error}!`)
   }
 }
 
