@@ -10,7 +10,7 @@ const { event, payload, sha } = tools.context
 async function run() {
   const pr = payload.pull_request
 
-  const source = event + pr ? `on PR #${pr.number}` : ""
+  const source = pr ? `PR #${pr.number}` : event
   tools.log(`Action triggered on ${source} with sha ${sha}`)
 
   // read api change report
@@ -31,7 +31,7 @@ async function run() {
   const body = `## API Breakage Report\n${report}`
 
   try {
-    octokit.issues.createComment({
+    await octokit.issues.createComment({
       owner,
       repo,
       issue_number: pr

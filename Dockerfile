@@ -1,34 +1,17 @@
-# Stage 1: Build swift sources from two refs and diff the resulting API
-FROM swift:5.1.3 AS build
+# Build swift sources from two refs and diff the resulting API
+FROM swift:5.1.3
 
-ARG REPORTFILE=/report.txt
+# Workaround for an issue in the swift image https://forums.swift.org/t/lldb-install-precludes-installing-python-in-image/24040
+RUN mv /usr/lib/python2.7/site-packages /usr/lib/python2.7/dist-packages && \
+    ln -s dist-packages /usr/lib/python2.7/site-packages
 
 # Fetch dependencies
-RUN apt-get update && apt-get install -y jq
+RUN apt-get update && apt-get install -y jq curl
+RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
+RUN apt-get install -y nodejs
 
-COPY . .
+COPY . /
 
-# Run the breakage checker script and store the result
-RUN env
-RUN DIFFERENCES=$(./check_no_api_breakages.sh . $GITHUB_SHA $1 >> $REPORTFILE)
-
-RUN if [[ "$DIFFERENCES" == 0 ]]; then \
-    echo "" >> ${REPORTFILE} \
-  fi
-
-# Stage 2: Hand the API Diff report to the user
-FROM node:alpine AS action
-
-ARG ACTION_SRC_DIR=src
-ARG REPORTFILE
-
-COPY --from=build $REPORTFILE $REPORTFILE
-
-# Resolve dependencies
-COPY --from=build package*.json ./
 RUN npm ci
 
-# Copy the action's code
-COPY --from=build $ACTION_SRC_DIR .
-
-ENTRYPOINT ["node", "entrypoint.js", $REPORTFILE]
+ENTRYPOINT [ "/entrypoint.sh" ]
