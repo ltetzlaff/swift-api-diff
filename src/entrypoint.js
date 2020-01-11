@@ -1,8 +1,12 @@
 const { readFile } = require("fs").promises
 const { Toolkit } = require("actions-toolkit")
+const getComments = require("./get-comments")
+
 const tools = new Toolkit()
 const argv = process.argv.slice(2)
 // const arguments = tools.arguments
+
+const me = "github-actions[bot]"
 
 const [ reportFilePath ] = argv
 const { event, payload, sha } = tools.context
@@ -23,20 +27,32 @@ async function run() {
     report = error
   }
 
-  const octokit = tools.github
+  const {issues} = tools.github
 
   // add comment on PR
   const { owner, repo } = tools.context.repo
+  const params = { owner, repo }
 
   const body = `## API Breakage Report\n${report}`
 
+  const commentParams = {
+    ...params,
+    issue_number: pr
+      ? pr.number
+      : tools.context.issue.number
+  }
+
   try {
-    await octokit.issues.createComment({
-      owner,
-      repo,
-      issue_number: pr
-        ? pr.number
-        : tools.context.issue.number,
+    const myComments = await getComments(issues, commentParams, me)
+
+    // Delete old comments by this action
+    await Promise.all(myComments.map(async ({ id }) => issues.deleteComment({
+      ...commentParams,
+      comment_id: id
+    })))
+
+    await issues.createComment({
+      ...commentParams,
       body
     })
 

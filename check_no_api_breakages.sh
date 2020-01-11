@@ -36,7 +36,7 @@ function build_and_do() {
 
     (
     cd "$repodir"
-    git checkout -q "$tag"
+    git -c advice.detachedHead=false checkout -q "$tag"
     swift build
     while read -r module; do
         swift api-digester -sdk "$sdk" -dump-sdk -module "$module" \
@@ -71,13 +71,11 @@ fi
 
 hash jq 2> /dev/null || { echo >&2 "ERROR: jq must be installed"; exit 1; }
 tmpdir=$(mktemp -d /tmp/.check-api_XXXXXX)
-repo_url=$1
+repodir=$1
 new_tag=$2
 shift 2
 
-repodir="$tmpdir/repo"
-git clone -q "$repo_url" "$repodir"
-git -C "$repodir" fetch -q origin '+refs/pull/*:refs/remotes/origin/pr/*'
+git -C "$repodir" fetch -q --prune
 errors=0
 
 for old_tag in "$@"; do
@@ -103,9 +101,12 @@ for old_tag in "$@"; do
             > "$report" 2>&1
 
         if ! shasum "$report" | grep -q cefc4ee5bb7bcdb7cb5a7747efa178dab3c794d5; then
+            echo ERROR
             echo >&2 "🔀 Public API change in $f"
             cat >&2 "$report"
             errors=$(( errors + 1 ))
+        else
+            echo OK
         fi
     done
     rm -rf "$tmpdir/api-new" "$tmpdir/api-old"
