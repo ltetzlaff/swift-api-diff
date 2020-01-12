@@ -3,12 +3,10 @@ const { Toolkit } = require("actions-toolkit")
 const getComments = require("./get-comments")
 
 const tools = new Toolkit()
-const argv = process.argv.slice(2)
-// const arguments = tools.arguments
 
 const me = "github-actions[bot]"
 
-const [ reportFilePath ] = argv
+const [, , reportFilePath] = process.argv
 const { event, payload, sha } = tools.context
 
 async function run() {
@@ -23,11 +21,13 @@ async function run() {
     report = await readFile(reportFilePath, { encoding: "utf8" })
   } catch {
     const error = "❌ Could not read report file"
-    tools.log.error(`${error} from path at argv[0]: ${reportFilePath}\nargv: ${argv}`)
+    tools.log.error(
+      `${error} from path at argv[0]: ${reportFilePath}\nargv: ${argv}`
+    )
     report = error
   }
 
-  const {issues} = tools.github
+  const { issues } = tools.github
 
   // add comment on PR
   const { owner, repo } = tools.context.repo
@@ -37,19 +37,21 @@ async function run() {
 
   const commentParams = {
     ...params,
-    issue_number: pr
-      ? pr.number
-      : tools.context.issue.number
+    issue_number: pr ? pr.number : tools.context.issue.number
   }
 
   try {
     const myComments = await getComments(issues, commentParams, me)
 
     // Delete old comments by this action
-    await Promise.all(myComments.map(async ({ id }) => issues.deleteComment({
-      ...commentParams,
-      comment_id: id
-    })))
+    await Promise.all(
+      myComments.map(async ({ id }) =>
+        issues.deleteComment({
+          ...commentParams,
+          comment_id: id
+        })
+      )
+    )
 
     await issues.createComment({
       ...commentParams,

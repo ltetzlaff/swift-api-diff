@@ -5,11 +5,13 @@ module.exports = async function getComments(issues, params, ofUser) {
 
   let page = 0
   while (true) {
-    const nextComments = (await issues.listComments({
-      ...params,
-      per_page: PER_PAGE,
-      page
-    })).data
+    const nextComments = (
+      await issues.listComments({
+        ...params,
+        per_page: PER_PAGE,
+        page
+      })
+    ).data
 
     if (ofUser === undefined) {
       myComments.push(...nextComments)
