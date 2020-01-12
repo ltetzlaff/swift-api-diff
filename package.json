@@ -3,14 +3,25 @@
   "version": "0.1.0",
   "description": "Comment changes in public interfaces on GitHub Pull Requests",
   "main": "src/entrypoint.js",
-  "files": ["src"],
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "lint": "tslint --format stylish --project .",
+    "prettier": "prettier --config node_modules/tslint-lt/.prettierrc.yml --write \"**/*.{ts,tsx,css,scss,html,js,jsx,yml,json,md}\" \"!{,dist}/**\"",
+    "test": "npm run lint && npm run prettier"
+  },
   "author": "ltetzlaff",
   "license": "Apache-2.0",
-  "dependencies": {
-    "actions-toolkit": "^2.2.0"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/ltetzlaff/swift-api-diff.git"
+  },
+  "dependencies": {
+    "actions-toolkit": "^2.2.0"
+  },
+  "devDependencies": {
+    "tslint-lt": "^1.11.0",
+    "typescript": "^3.7.4"
   }
 }

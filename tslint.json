@@ -1,0 +1,6 @@
+{
+  "extends": "tslint-lt",
+  "jsRules": {
+    "no-require-imports": false
+  }
+}
